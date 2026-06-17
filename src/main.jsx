@@ -11,6 +11,9 @@ import Category from './Routes/Category.jsx'
 import { Provider } from 'react-redux'
 import myntraStore from './store/index.js'
 
+const routerBaseName = !import.meta.env.PROD || import.meta.env.BASE_URL === "/"
+  ? undefined
+  : import.meta.env.BASE_URL.replace(/\/$/, "");
 
 const router=createBrowserRouter([
   {
@@ -32,7 +35,9 @@ const router=createBrowserRouter([
       },
     ],
   },
-])
+], {
+  basename: routerBaseName,
+})
 createRoot(document.getElementById('root')).render(
   <StrictMode>  
     <Provider store={myntraStore}>
