@@ -6,14 +6,11 @@ const BagItems=({item})=>{
 
    const removeItems=()=>{ dispatch(bagActions.removeFromBag(item.id))
    }
-return(<div className="bag-items-container">
-        
-   <div className="bag-item-container">
+return(<div className="bag-item-container">
     <div className="item-left-part">
-      <img className="bag-item-img" src={item.image}/>
+      <img className="bag-item-img" src={item.image} alt={item.item_name}/>
     </div>
     <div className="item-right-part">
-      <div className="company">{item.company}</div>
       <div className="item-name">{item.item_name}</div>
       <div className="price-container">
         <span className="current-price">Rs {item.current_price}</span>
@@ -28,10 +25,8 @@ return(<div className="bag-items-container">
         <span className="delivery-details-days">{item.delivery_date}</span>
       </div>
     </div>
-
     <div className="remove-from-cart" onClick={removeItems}>X</div>
   </div>
-    </div>
 )
 }
 export default BagItems;

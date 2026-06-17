@@ -1,19 +1,34 @@
 // src/store/items-slice.js
 import { createSlice } from "@reduxjs/toolkit";
 
+const loadBag = () => {
+  try {
+    const savedBag = localStorage.getItem("fashionhub-bag");
+    return savedBag ? JSON.parse(savedBag) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveBag = (bagItems) => {
+  localStorage.setItem("fashionhub-bag", JSON.stringify(bagItems));
+};
 
 const bagSlice = createSlice({
   name: "bag",
-  initialState:[],
+  initialState:loadBag(),
   reducers: {
     addToBag: (state, action) => {
-     state.push(action.payload)
-
+     if (!state.includes(action.payload)) {
+      state.push(action.payload)
+      saveBag(state);
+     }
     },
     
     removeFromBag: (state, action) => {
-     return state.filter(itemId=>itemId !==action.payload)
-
+     const updatedBag = state.filter(itemId=>itemId !==action.payload)
+     saveBag(updatedBag);
+     return updatedBag;
     },
   },
 });
