@@ -53,6 +53,18 @@ const fallbackItems = [
     rating: { stars: 4.3, count: 530 },
   },
   {
+    id: "009",
+    image: "images/Polotshirt.jpg",
+    company: "FashionHub",
+    item_name: "Men's Polo T-Shirt",
+    original_price: 1699,
+    current_price: 1099,
+    discount_percentage: 35,
+    return_period: 14,
+    delivery_date: "10 Oct 2026",
+    rating: { stars: 4.5, count: 860 },
+  },
+  {
     id: "005",
     image: "images/Womanshirt.jpg",
     company: "FashionHub",
@@ -92,7 +104,7 @@ const fallbackItems = [
     id: "008",
     image: "images/Redscarf.jpg",
     company: "FashionHub",
-    item_name: "Red Accent Scarf",
+    item_name: "Women Red Accent Scarf",
     original_price: 799,
     current_price: 499,
     discount_percentage: 38,
@@ -105,15 +117,24 @@ const fallbackItems = [
 const FetchItems=()=>{ 
   const fetchDone=useSelector(store=>store.fetchStatus.fetchDone);
   const dispatch=useDispatch();
+  const apiUrl = import.meta.env.VITE_ITEMS_API_URL;
 
   useEffect(()=>{
     if(fetchDone) return;
+
+    if (!apiUrl) {
+      dispatch(itemsActions.addInitialItems(fallbackItems));
+      dispatch(fetchStatusActions.markFetchDone());
+      dispatch(fetchStatusActions.markFetchingFinished());
+      return;
+    }
+
     const controller=new AbortController();
     const signal=controller.signal;
 
     dispatch(fetchStatusActions.markFetchingStarted());
 
-    fetch("http://localhost:8080/items",{signal})
+    fetch(apiUrl,{signal})
     .then((res)=>{
       if(!res.ok){
         throw new Error(`Request failed with status ${res.status}`);
@@ -133,7 +154,7 @@ const FetchItems=()=>{
       dispatch(fetchStatusActions.markFetchingFinished());
     });
     return ()=>controller.abort();
-  },[dispatch,fetchDone])
+  },[apiUrl,dispatch,fetchDone])
   return 
 }
 export default FetchItems;

@@ -4,6 +4,7 @@ import { bagActions } from "../store/bagSlice";
 import { wishlistActions } from "../store/wishlistSlice";
 import { IoAddOutline, IoRemoveCircleOutline } from "react-icons/io5";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { getImagePath } from "../utils/imagePath";
 
 const HomeItem=({item})=>{
 const itemRef=useRef(null);
@@ -46,7 +47,7 @@ useEffect(()=>{
 
   return (<article className="item-container reveal-card" ref={itemRef}>
       <div className="item-media">
-        <img className="item-image" src={item.image} alt={item.item_name}/>
+        <img className="item-image" src={getImagePath(item.image)} alt={item.item_name}/>
         <span className="rating">{item.rating.stars} star | {item.rating.count}</span>
       </div>
       <div className="item-content">

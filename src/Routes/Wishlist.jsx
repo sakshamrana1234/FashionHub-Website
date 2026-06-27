@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { wishlistActions } from "../store/wishlistSlice";
+import { getImagePath } from "../utils/imagePath";
 
 const Wishlist = () => {
   const dispatch = useDispatch();
@@ -29,7 +30,7 @@ const Wishlist = () => {
               {finalItems.map((item) => (
                 <article className="wishlist-item" key={item.id}>
                   <div className="wishlist-media">
-                    <img src={item.image} alt={item.item_name} />
+                    <img src={getImagePath(item.image)} alt={item.item_name} />
                   </div>
                   <div className="wishlist-content">
                     <h3>{item.item_name}</h3>
@@ -60,7 +61,7 @@ const Wishlist = () => {
               {suggestedItems.map((item) => (
                 <article className="wishlist-item" key={item.id}>
                   <div className="wishlist-media">
-                    <img src={item.image} alt={item.item_name} />
+                    <img src={getImagePath(item.image)} alt={item.item_name} />
                   </div>
                   <div className="wishlist-content">
                     <h3>{item.item_name}</h3>

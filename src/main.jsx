@@ -10,6 +10,7 @@ import Wishlist from './Routes/Wishlist.jsx'
 import Category from './Routes/Category.jsx'
 import { Provider } from 'react-redux'
 import myntraStore from './store/index.js'
+import NotFound from './Routes/NotFound.jsx'
 
 const routerBaseName = !import.meta.env.PROD || import.meta.env.BASE_URL === "/"
   ? undefined
@@ -19,6 +20,7 @@ const router=createBrowserRouter([
   {
     path:"/",
     element:<App/>,
+    errorElement:<NotFound/>,
     children:[
       {path:"/",element:<Home/>},
       {path:"/women",element:<Category type="women"/>},
@@ -32,6 +34,10 @@ const router=createBrowserRouter([
       {
         path:"/wishlist",
         element:<Wishlist/>,
+      },
+      {
+        path:"*",
+        element:<NotFound/>,
       },
     ],
   },

@@ -1,5 +1,6 @@
 import { useDispatch } from "react-redux";
 import { bagActions } from "../store/bagSlice";
+import { getImagePath } from "../utils/imagePath";
 
 const BagItems=({item})=>{
   const dispatch =useDispatch()
@@ -8,7 +9,7 @@ const BagItems=({item})=>{
    }
 return(<div className="bag-item-container">
     <div className="item-left-part">
-      <img className="bag-item-img" src={item.image} alt={item.item_name}/>
+      <img className="bag-item-img" src={getImagePath(item.image)} alt={item.item_name}/>
     </div>
     <div className="item-right-part">
       <div className="item-name">{item.item_name}</div>

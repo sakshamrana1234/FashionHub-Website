@@ -3,17 +3,45 @@ import { FaRegHeart, FaSearch } from "react-icons/fa";
 import { IoPersonOutline } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useEffect, useRef, useState } from "react";
 
 const Header=()=>{
 const bag = useSelector(store=>store.bag)
 const wishlist = useSelector(store=>store.wishlist)
+const [isHidden,setIsHidden]=useState(false);
+const lastScrollY=useRef(0);
+
+useEffect(()=>{
+  const handleScroll=()=>{
+    const currentScrollY=window.scrollY;
+
+    if(currentScrollY < 40){
+      setIsHidden(false);
+      document.body.classList.remove("header-is-hidden");
+    } else if(currentScrollY > lastScrollY.current + 8){
+      setIsHidden(true);
+      document.body.classList.add("header-is-hidden");
+    } else if(currentScrollY < lastScrollY.current - 8){
+      setIsHidden(false);
+      document.body.classList.remove("header-is-hidden");
+    }
+
+    lastScrollY.current=currentScrollY;
+  };
+
+  window.addEventListener("scroll",handleScroll,{passive:true});
+  return ()=>{
+    document.body.classList.remove("header-is-hidden");
+    window.removeEventListener("scroll",handleScroll);
+  };
+},[]);
 
 return (
- <header className="site-header">
+ <header className={`site-header ${isHidden ? "site-header-hidden" : ""}`}>
         <div className="header-shell">
           <Link className="brand-lockup" to="/">
             <span>FH</span>
-            <strong>FashionHub</strong>
+            <strong>FashionHub </strong>
           </Link>
 
           <nav className="nav_bar" aria-label="Primary navigation">
