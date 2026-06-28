@@ -23,26 +23,27 @@ const Home = () => {
     let frameId;
     let targetProgress = 0;
     let currentProgress = 0;
+    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
     const applyHeroScale = (progress) => {
-      const easedProgress = 1 - Math.pow(1 - progress, 3);
-      const visualTop = 86;
-      const availableHeight = window.innerHeight - visualTop - 28;
-      const maxFitScale = Math.max(1, availableHeight / heroVisualElement.offsetHeight);
-      const targetScale = 1 + easedProgress * 0.34;
-      const zoomScale = Math.min(targetScale, maxFitScale);
-      const visualRect = heroVisualElement.getBoundingClientRect();
-      const currentTransform = getComputedStyle(heroVisualElement).transform;
-      const currentShift = currentTransform === "none" ? 0 : new DOMMatrixReadOnly(currentTransform).m41;
-      const unshiftedCenter = visualRect.left - currentShift + visualRect.width / 2;
-      const centerShift = (window.innerWidth / 2 - unshiftedCenter) * easedProgress;
-      const liftShift = -68 * easedProgress;
+      const easedProgress = progress < 0.5
+        ? 4 * progress * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+      const startDrop = -window.innerHeight * 0.1;
+      const endDrop = window.innerHeight * 0.08;
+      const downShift = startDrop + (endDrop - startDrop) * easedProgress;
+      const zoomScale = 0.86 + easedProgress * 0.34;
 
       heroElement.style.setProperty("--hero-image-scale", zoomScale.toFixed(3));
-      heroElement.style.setProperty("--hero-model-shift", `${centerShift.toFixed(1)}px`);
-      heroElement.style.setProperty("--hero-model-lift", `${liftShift.toFixed(1)}px`);
+      heroElement.style.setProperty("--hero-model-drop", `${downShift.toFixed(1)}px`);
       heroElement.style.setProperty("--hero-model-radius", `${Math.max(0, 8 - easedProgress * 8).toFixed(1)}px`);
       heroElement.style.setProperty("--hero-copy-opacity", "1");
+    };
+
+    const updateTargetProgress = () => {
+      const heroStart = heroElement.offsetTop;
+      const heroScrollDistance = Math.max(1, heroElement.offsetHeight - window.innerHeight);
+      targetProgress = clamp((window.scrollY - heroStart) / heroScrollDistance, 0, 1);
     };
 
     const renderHeroScale = () => {
@@ -74,6 +75,9 @@ const Home = () => {
     };
 
     const handlePageScroll = () => {
+      updateTargetProgress();
+      startHeroAnimation();
+
       const womenElement = womenSectionRef.current;
       if (!womenElement) return;
 
@@ -84,43 +88,20 @@ const Home = () => {
       }
     };
 
-    const handleWheel = (event) => {
-      if (window.matchMedia("(max-width: 980px)").matches) return;
-
-      const rect = heroElement.getBoundingClientRect();
-      const isHeroActive = rect.top < window.innerHeight * 0.7 && rect.bottom > window.innerHeight * 0.45;
-      const zoomIsSettled = Math.abs(targetProgress - currentProgress) <= 0.01;
-      const zoomIsFinished = targetProgress >= 1 && currentProgress >= 0.995 && zoomIsSettled;
-
-      if (event.deltaY > 0 && isHeroActive && !zoomIsFinished) {
-        event.preventDefault();
-        if (targetProgress < 1) {
-          targetProgress = Math.min(targetProgress + event.deltaY / 520, 1);
-        }
-        startHeroAnimation();
-        return;
-      }
-
-      if (event.deltaY < 0 && isHeroActive && targetProgress > 0) {
-        event.preventDefault();
-        targetProgress = Math.max(targetProgress + event.deltaY / 520, 0);
-        startHeroAnimation();
-        return;
-      }
-    };
-
     const handleResize = () => {
+      updateTargetProgress();
       applyHeroScale(currentProgress);
+      startHeroAnimation();
     };
 
-    applyHeroScale(0);
-    window.addEventListener("wheel", handleWheel, { passive: false });
+    updateTargetProgress();
+    currentProgress = targetProgress;
+    applyHeroScale(currentProgress);
     window.addEventListener("scroll", handlePageScroll, { passive: true });
     window.addEventListener("resize", handleResize);
 
     return () => {
       window.cancelAnimationFrame(frameId);
-      window.removeEventListener("wheel", handleWheel);
       window.removeEventListener("scroll", handlePageScroll);
       window.removeEventListener("resize", handleResize);
     };
@@ -129,20 +110,22 @@ const Home = () => {
   return (
     <main>
       <section className="hero-section" ref={heroRef}>
-        <div className="hero-copy">
-          <span className="hero-label">New season edit</span>
-          <h1>Style that looks collected, not copied.</h1>
-          <p>Discover sharp essentials, statement layers, and everyday pieces curated for a fresher FashionHub identity.</p>
-          <div className="hero-actions">
-            <Link to="/women" className="primary-cta">Shop the edit</Link>
-            <Link to="/sale" className="secondary-cta">View trends</Link>
+        <div className="hero-sticky">
+          <div className="hero-copy">
+            <span className="hero-label">New season edit</span>
+            <h1>Style that looks collected, not copied.</h1>
+            <p>Discover sharp essentials, statement layers, and everyday pieces curated for a fresher FashionHub identity.</p>
+            <div className="hero-actions">
+              <Link to="/women" className="primary-cta">Shop the edit</Link>
+              <Link to="/sale" className="secondary-cta">View trends</Link>
+            </div>
           </div>
-        </div>
-        <div className="hero-visual" ref={heroVisualRef}>
-          <img src={getImagePath("images/newmodelimage.jpg")} alt="FashionHub editorial model" />
-          <div className="hero-badge">
-            <span>Fresh Drop</span>
-            <strong>08 styles live</strong>
+          <div className="hero-visual" ref={heroVisualRef}>
+            <img src={getImagePath("images/newmodelimage.jpg")} alt="FashionHub editorial model" />
+            <div className="hero-badge">
+              <span>Fresh Drop</span>
+              <strong>08 styles live</strong>
+            </div>
           </div>
         </div>
       </section>
